@@ -346,9 +346,6 @@ size_t split_lines(const char *todis, SplitLines &lines, int wii, int fonnt, siz
 	bool isKorean = !_G(trans_name).CompareNoCase("korean");
 	bool isKSX1001 = isKorean && get_uformat() == U_ASCII;
 	bool wideChar = false;
-	bool useWordwrap = true;
-	if (isKorean)
-		useWordwrap = false;
 	while (1) {
 		char *split_at = nullptr;
 
@@ -382,7 +379,7 @@ size_t split_lines(const char *todis, SplitLines &lines, int wii, int fonnt, siz
 
 			if (get_text_width_outlined(theline, fonnt) > wii) {
 				// line is too wide, order the split
-				if (useWordwrap && last_whitespace)
+				if (!wideChar && last_whitespace)
 					// revert to the last whitespace
 					split_at = last_whitespace;
 				else
