@@ -61,6 +61,9 @@ const char *get_translation(const char *text) {
 }
 
 int IsTranslationAvailable() {
+	if (strcmp(get_gameguid(), "{cf1b8753-2ad1-4d79-b5c7-f6aff4fdc729}") == 0 /* King's Quest I v4.1c */) {
+		return 0;
+	}
 	if (get_translation_tree().size() > 0)
 		return 1;
 	return 0;
