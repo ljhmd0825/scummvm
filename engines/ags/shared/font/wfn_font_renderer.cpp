@@ -151,10 +151,12 @@ bool WFNFontRenderer::LoadFromDisk(int fontNumber, int fontSize) {
 
 int WFNFontRenderer::GetFontHeight(int fontNumber) {
 	const WFNFont *font = _fontData[fontNumber].Font;
+	const FontRenderParams &params = _fontData[fontNumber].Params;
+	int height = 0;
 	if (font->GetWCharCount() == KoreanCharCount) {
-		return font->GetWChar(0xB0, 0xA1).Height;	// Height of First extended character
+		height = font->GetWChar(0xB0, 0xA1).Height;       // Height of First extended character
 	}
-	return 0;
+	return height * params.SizeMultiplier;
 }
 
 bool WFNFontRenderer::IsBitmapFont() {
