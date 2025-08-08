@@ -142,6 +142,14 @@ bool WFNFontRenderer::LoadFromDiskEx(int fontNumber, int /*fontSize*/, String *s
 		delete font;
 		return false;
 	}
+
+	// Load Extended Bitmap Font
+	file_name.Format("extfnt%d.wfn", fontNumber);
+	ffi = _GP(AssetMgr)->OpenAsset(file_name);
+	if (ffi != nullptr) {
+		font->ReadExtFntFromFile(ffi);
+	}
+
 	_fontData[fontNumber].Font = font;
 	_fontData[fontNumber].Params = params ? *params : FontRenderParams();
 	if (src_filename)
@@ -157,7 +165,7 @@ void WFNFontRenderer::FreeMemory(int fontNumber) {
 }
 
 bool WFNFontRenderer::SupportsExtendedCharacters(int fontNumber) {
-	return _fontData[fontNumber].Font->GetCharCount() > 128;
+	return _fontData[fontNumber].Font->GetCharCount() + _fontData[fontNumber].Font->GetWCharCount() > 128;
 }
 
 } // namespace AGS3

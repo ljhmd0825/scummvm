@@ -146,6 +146,9 @@ extern int ustrsizez(const char *s);
 extern int need_uconvert(const char *s, int type, int newtype);
 extern int uvszprintf(char *buf, int size, const char *format, va_list args);
 
+/* EUC-KR Korean trans? */
+extern bool isKSX1001(int c);
+
 } // namespace AGS3
 
 #endif

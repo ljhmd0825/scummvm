@@ -40,6 +40,8 @@ int (*ucwidth)(int c) = utf8_cwidth;
 /* uisok: */
 int (*uisok)(int c) = utf8_isok;
 
+static bool ksx1001 = false;
+
 struct UTYPE_INFO {
 	int id;
 	AL_METHOD(int, u_getc, (const char *s));
@@ -87,6 +89,7 @@ void set_uformat(int type) {
 		uwidth = info->u_width;
 		ucwidth = info->u_cwidth;
 		uisok = info->u_isok;
+		ksx1001 = (type == U_ASCII) && !_G(trans_name).CompareNoCase("korean");
 	}
 }
 
@@ -228,28 +231,98 @@ int utf8_isok(int c) {
 }
 
 
+inline bool is_ksx1001_code(int hi, int lo) {
+	return ((hi >= 0xB0) && (hi <= 0xC8) && (lo >= 0xA1) && (lo <= 0xFE));
+}
+
+static int ksx1001_getc(const char *s) {
+	int hi = *((const unsigned char *)s);
+	int lo = *((const unsigned char *)(s + 1));
+
+	if (is_ksx1001_code(hi, lo))
+		return hi << 8 | lo;
+	return hi;
+}
+
+static int ksx1001_getx(char **s) {
+	int hi = *((unsigned char *)((*s)++));
+	int lo = *((unsigned char *)((*s)));
+
+	if (is_ksx1001_code(hi, lo)) {
+		(*s)++;
+		return hi << 8 | lo;
+	}
+	return hi;
+}
+
+static int ksx1001_setc(char *s, int c) {
+	int hi = c >> 8;
+	int lo = c & 0xff;
+
+	if (is_ksx1001_code(hi, lo)) {
+		*s = hi;
+		*(s + 1) = lo;
+		return 2;
+	}
+	*s = c;
+	return 1;
+}
+
+static int ksx1001_width(const char *s) {
+	int hi = *((const unsigned char *)(s++));
+	int lo = *((const unsigned char *)(s));
+
+	return is_ksx1001_code(hi, lo) ? 2 : 1;
+}
+
+static int ksx1001_cwidth(int c) {
+	int hi = c >> 8;
+	int lo = c & 0xff;
+
+	return is_ksx1001_code(hi, lo) ? 2 : 1;
+}
+
+static int ksx1001_isok(int c) {
+	uint8_t hi = c >> 8;
+	uint8_t lo = c & 0xff;
+
+	return is_ksx1001_code(hi, lo) || ((c >= 0) && (c <= 255));
+}
+
 int ascii_getc(const char *s) {
+	if (ksx1001)
+		return ksx1001_getc(s);
 	return *((const unsigned char *)s);
 }
 
 int ascii_getx(char **s) {
+	if (ksx1001)
+		return ksx1001_getx(s);
 	return *((unsigned char *)((*s)++));
 }
 
 int ascii_setc(char *s, int c) {
+	if (ksx1001)
+		return ksx1001_setc(s, c);
 	*s = c;
 	return 1;
 }
 
 int ascii_width(const char *s) {
+	if (ksx1001)
+		return ksx1001_width(s);
 	return 1;
 }
 
 int ascii_cwidth(int c) {
+	if (ksx1001)
+		return ksx1001_cwidth(c);
 	return 1;
 }
 
 int ascii_isok(int c) {
+	if (ksx1001)
+		return ksx1001_isok(c);
 	return ((c >= 0) && (c <= 255));
 }
 
@@ -1310,6 +1383,12 @@ int need_uconvert(const char *s, int type, int newtype) {
 int uvszprintf(char *buf, int size, const char *format, va_list args) {
 	error("TODO: uvszprintf");
 	return 0;
+}
+
+bool isKSX1001(int c) {
+	int hi = c >> 8;
+	int lo = c & 0xff;
+	return ksx1001 && (hi >= 0xB0) && (hi <= 0xC8) && (lo >= 0xA1) && (lo <= 0xFE);
 }
 
 } // namespace AGS3

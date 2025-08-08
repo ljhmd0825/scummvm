@@ -1148,6 +1148,11 @@ void alfont_textout_aa_ex(BITMAP *bmp, ALFONT_FONT *f, const char *s, int x, int
 			if (x_tmp > bmp->cr)
 				break;
 
+			/* Convert EUC-KR to UniCode*/
+			if (isKSX1001(character)) {
+				character = Common::convertUHCToUCS(character >> 8, character & 0xff);
+			}
+
 			/* get the character out of the font */
 			if (f->face->charmap)
 				glyph_index_tmp = Get_Char_Index(f->face, character);
@@ -1189,6 +1194,11 @@ void alfont_textout_aa_ex(BITMAP *bmp, ALFONT_FONT *f, const char *s, int x, int
 		/* if left side of char farther than right side of clipping, we are done */
 		if (x > bmp->cr)
 			break;
+
+		/* Convert EUC-KR to UniCode*/
+		if (isKSX1001(character)) {
+			character = Common::convertUHCToUCS(character >> 8, character & 0xff);
+		}
 
 		/* get the character out of the font */
 		if (f->face->charmap)
@@ -2234,6 +2244,11 @@ void alfont_textout_ex(BITMAP * bmp, ALFONT_FONT * f, const char *s, int x, int 
 			if (x_tmp > bmp->cr)
 				break;
 
+			/* Convert EUC-KR to UniCode*/
+			if (isKSX1001(character)) {
+				character = Common::convertUHCToUCS(character >> 8, character & 0xff);
+			}
+
 			/* get the character out of the font */
 			if (f->face->charmap)
 				glyph_index_tmp = Get_Char_Index(f->face, character);
@@ -2274,6 +2289,11 @@ void alfont_textout_ex(BITMAP * bmp, ALFONT_FONT * f, const char *s, int x, int 
 		/* if left side of char farther than right side of clipping, we are done */
 		if (x > bmp->cr)
 			break;
+
+		/* Convert EUC-KR to UniCode*/
+		if (isKSX1001(character)) {
+			character = Common::convertUHCToUCS(character >> 8, character & 0xff);
+		}
 
 		/* get the character out of the font */
 		if (f->face->charmap)
@@ -3024,6 +3044,11 @@ int alfont_text_length(ALFONT_FONT * f, const char *str) {
 			}
 #endif
 
+			/* Convert EUC-KR to UniCode*/
+			if (isKSX1001(character)) {
+				character = Common::convertUHCToUCS(character >> 8, character & 0xff);
+			}
+
 			/* get the character out of the font */
 			if (f->face->charmap)
 				glyph_index_tmp = Get_Char_Index(f->face, character);
@@ -3053,6 +3078,11 @@ int alfont_text_length(ALFONT_FONT * f, const char *str) {
 			lpszW--;
 		}
 #endif
+
+		/* Convert EUC-KR to UniCode*/
+		if (isKSX1001(character)) {
+			character = Common::convertUHCToUCS(character >> 8, character & 0xff);
+		}
 
 		if (f->face->charmap)
 			glyph_index = Get_Char_Index(f->face, character);

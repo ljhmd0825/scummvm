@@ -89,6 +89,16 @@ public:
 		return static_cast<uint16_t>(_refs.size());
 	}
 
+	inline uint16_t GetWCharCount() const {
+		return static_cast<uint16_t>(_refs_ext.size());
+	}
+
+	inline bool IsKSX1001(uint16_t code) const {
+		uint8_t hi = code >> 8;
+		uint8_t lo = code & 0xff;
+		return (_refs_ext.size() == 2350 && hi >= 0xB0 && hi <= 0xC8 && lo >= 0xA1 && lo <= 0xFE);
+	}
+
 	// Get WFN character for the given code; if the character is missing, returns empty character
 	const WFNChar &GetChar(uint16_t code) const;
 
@@ -96,11 +106,18 @@ public:
 	// Reads WFNFont object, using data_size bytes from stream; if data_size = 0,
 	// the available stream's length is used instead. Returns error code.
 	WFNError ReadFromFile(AGS::Shared::Stream *in, const soff_t data_size = 0);
+	WFNError ReadExtFntFromFile(AGS::Shared::Stream *in, const soff_t data_size = 0);
 
 protected:
 	std::vector<const WFNChar *> _refs;      // reference array, contains pointers to elements of _items
 	std::vector<WFNChar>        _items;     // actual character items
 	std::vector<uint8_t>        _pixelData; // pixel data array
+
+	// Extended Bitmap Font
+	std::vector<const WFNChar *> _refs_ext;      // reference array, contains pointers to elements of _items
+	std::vector<WFNChar>        _items_ext;     // actual character items
+	std::vector<uint8_t>        _pixelData_ext; // pixel data array};
+
 };
 
 } // namespace AGS3
