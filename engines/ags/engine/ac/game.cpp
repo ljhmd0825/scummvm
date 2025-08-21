@@ -642,9 +642,11 @@ const char *Game_GetTranslationFilename() {
 
 int Game_ChangeTranslation(const char *newFilename) {
 	if ((newFilename == nullptr) || (newFilename[0] == 0)) { // switch back to default translation
-		close_translation();
-		_GP(usetup).translation = "";
-		GUI::MarkForTranslationUpdate();
+		if (_GP(usetup).translation.IsEmpty()) {
+			close_translation();
+			_GP(usetup).translation = "";
+			GUI::MarkForTranslationUpdate();
+		}
 		return 1;
 	}
 
