@@ -112,6 +112,15 @@ bool WFNFontRenderer::LoadFromDisk(int fontNumber, int fontSize) {
 	return LoadFromDiskEx(fontNumber, fontSize, nullptr, nullptr, nullptr);
 }
 
+int WFNFontRenderer::GetFontHeight(int fontNumber) {
+    const WFNFont *font = _fontData[fontNumber].Font;
+    uint16_t firstExtChar = 0xB0A1; /* Ga */
+    if (font->IsKSX1001(firstExtChar)) {
+        return font->GetChar(firstExtChar).Height;   // Height of First extended character
+    }
+    return 0;
+}
+
 bool WFNFontRenderer::IsBitmapFont() {
 	return true;
 }
