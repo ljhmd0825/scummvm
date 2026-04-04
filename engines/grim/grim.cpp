@@ -262,35 +262,19 @@ GfxBase *GrimEngine::createRenderer(int screenW, int screenH) {
 	Graphics::RendererType desiredRendererType = Graphics::Renderer::parseTypeCode(rendererConfig);
 	uint32 availableRendererTypes = Graphics::Renderer::getAvailableTypes();
 
-	availableRendererTypes &=
+availableRendererTypes = 0;
+
 #if defined(USE_OPENGL_GAME)
-			Graphics::kRendererTypeOpenGL |
+	availableRendererTypes |= Graphics::kRendererTypeOpenGL;
 #endif
+
 #if defined(USE_OPENGL_SHADERS)
-			Graphics::kRendererTypeOpenGLShaders |
+	availableRendererTypes |= Graphics::kRendererTypeOpenGLShaders;
 #endif
+
 #if defined(USE_TINYGL)
-			Graphics::kRendererTypeTinyGL |
+	availableRendererTypes |= Graphics::kRendererTypeTinyGL;
 #endif
-			0;
-
-	// For Grim Fandango, Korean fan translation can only use OpenGL renderer
-	if (getGameType() == GType_GRIM && g_grim->getGameLanguage() == Common::KO_KOR) {
-		availableRendererTypes &= ~Graphics::kRendererTypeOpenGLShaders;
-		availableRendererTypes &= ~Graphics::kRendererTypeTinyGL;
-	}
-
-	// For Grim Fandango, OpenGL renderer without shaders is preferred if available
-	if (desiredRendererType == Graphics::kRendererTypeDefault &&
-		(availableRendererTypes & Graphics::kRendererTypeOpenGL) &&
-	    getGameType() == GType_GRIM) {
-		availableRendererTypes &= ~Graphics::kRendererTypeOpenGLShaders;
-	}
-
-	// Not supported yet.
-	if (getLanguage() == Common::Language::ZH_CHN || getLanguage() == Common::Language::ZH_TWN
-		|| getGameLanguage() == Common::Language::ZH_CHN || getGameLanguage() == Common::Language::ZH_TWN)
-		availableRendererTypes &= ~Graphics::kRendererTypeOpenGLShaders;
 
 	Graphics::RendererType matchingRendererType = Graphics::Renderer::getBestMatchingType(desiredRendererType, availableRendererTypes);
 
