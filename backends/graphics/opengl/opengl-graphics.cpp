@@ -1368,6 +1368,7 @@ void OpenGLGraphicsManager::notifyContextCreate(ContextType type,
 	GL_CALL(glDisable(GL_CULL_FACE));
 	GL_CALL(glDisable(GL_DEPTH_TEST));
 	GL_CALL(glDisable(GL_DITHER));
+	GL_CALL(glDisable(GL_STENCIL_TEST));
 
 	_pipeline->setColor(1.0f, 1.0f, 1.0f, 1.0f);
 
@@ -1537,7 +1538,11 @@ bool OpenGLGraphicsManager::getGLPixelFormat(const Graphics::PixelFormat &pixelF
 		glType = GL_UNSIGNED_BYTE;
 		return true;
 	} else if (!OpenGLContext.packedPixelsSupported) {
-		return false;
+        glIntFormat = GL_RGBA;
+        glFormat = GL_RGBA;
+        glType = GL_UNSIGNED_BYTE;
+        return true;
+    }
 	} else if (pixelFormat == Graphics::PixelFormat(2, 5, 6, 5, 0, 11, 5, 0, 0)) { // RGB565
 		glIntFormat = GL_RGB;
 		glFormat = GL_RGB;
