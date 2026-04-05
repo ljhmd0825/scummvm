@@ -117,6 +117,8 @@ bool OpenGLGraphicsManager::hasFeature(OSystem::Feature f) const {
 	case OSystem::kFeatureStretchMode:
 	case OSystem::kFeatureCursorMask:
 	case OSystem::kFeatureCursorMaskInvert:
+	case OSystem::kFeatureOpenGLForGame:
+    case OSystem::kFeatureOpenGLES2:
 #ifdef USE_SCALERS
 	case OSystem::kFeatureScalers:
 #endif
