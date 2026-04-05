@@ -19,6 +19,7 @@
  *
  */
 
+#define USE_FORCED_GLES2 1
 #define FORBIDDEN_SYMBOL_ALLOW_ALL
 
 #include "backends/platform/sdl/sdl.h"
@@ -358,6 +359,9 @@ void OSystem_SDL::detectOpenGLFeaturesSupport() {
 #else
 	// Spawn a 32x32 window off-screen with a GL context to test if framebuffers are supported
 #if SDL_VERSION_ATLEAST(2, 0, 0)
+    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 0);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	SDL_Window *window = SDL_CreateWindow("", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 32, 32, SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
 	if (!window) {
 		return;
