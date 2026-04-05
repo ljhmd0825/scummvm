@@ -79,7 +79,7 @@ Common::String Renderer::getTypeCode(RendererType type) {
 }
 
 uint32 Renderer::getAvailableTypes() {
-	uint32 available = 0;
+    uint32 available = 0;
 
 #if defined(USE_TINYGL)
 	/* TinyGL doesn't depend on hardware support */
@@ -87,25 +87,17 @@ uint32 Renderer::getAvailableTypes() {
 #endif
 
 #if defined(USE_OPENGL_GAME) || defined(USE_OPENGL_SHADERS)
-	bool backendCapableOpenGL = g_system->hasFeature(OSystem::kFeatureOpenGLForGame);
 
-	if (backendCapableOpenGL) {
-		/* Backend either support OpenGL or OpenGL ES(2) */
 #if defined(USE_OPENGL_GAME)
-		/* OpenGL classic is compiled in, check if hardware supports it */
-		if (g_system->getOpenGLType() == OpenGL::kContextGL) {
-			available |= kRendererTypeOpenGL;
-		}
+	available |= kRendererTypeOpenGL;
 #endif
+
 #if defined(USE_OPENGL_SHADERS)
-		/* OpenGL with shaders is compiled in, check if hardware supports it */
-		if (g_system->hasFeature(OSystem::kFeatureShadersForGame)) {
-			available |= kRendererTypeOpenGLShaders;
-		}
+	available |= kRendererTypeOpenGLShaders;
 #endif
-	}
-#endif // defined(USE_OPENGL_GAME) || defined(USE_OPENGL_SHADERS
-	return available;
+
+#endif
+    return available;
 }
 
 RendererType Renderer::getBestMatchingType(RendererType desired, uint32 available) {
