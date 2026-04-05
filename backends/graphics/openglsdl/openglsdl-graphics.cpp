@@ -49,6 +49,7 @@ OpenGLSdlGraphicsManager::OpenGLSdlGraphicsManager(SdlEventSource *eventSource, 
 	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
+	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 0);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
 	// Set up proper SDL OpenGL context creation.
@@ -542,6 +543,9 @@ bool OpenGLSdlGraphicsManager::setupMode(uint width, uint height) {
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, _glContextProfileMask);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, _glContextMajor);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, _glContextMinor);
+	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 0);
+	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
+	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
 #ifdef NINTENDO_SWITCH
 	// Switch quirk: Switch seems to need this flag, otherwise the screen
