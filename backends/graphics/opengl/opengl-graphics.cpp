@@ -1538,11 +1538,10 @@ bool OpenGLGraphicsManager::getGLPixelFormat(const Graphics::PixelFormat &pixelF
 		glType = GL_UNSIGNED_BYTE;
 		return true;
 	} else if (!OpenGLContext.packedPixelsSupported) {
-        glIntFormat = GL_RGBA;
-        glFormat = GL_RGBA;
-        glType = GL_UNSIGNED_BYTE;
-        return true;
-    }
+		glIntFormat = GL_RGBA;
+		glFormat = GL_RGBA;
+		glType = GL_UNSIGNED_BYTE;
+		return true;
 	} else if (pixelFormat == Graphics::PixelFormat(2, 5, 6, 5, 0, 11, 5, 0, 0)) { // RGB565
 		glIntFormat = GL_RGB;
 		glFormat = GL_RGB;
@@ -1559,8 +1558,6 @@ bool OpenGLGraphicsManager::getGLPixelFormat(const Graphics::PixelFormat &pixelF
 		glType = GL_UNSIGNED_SHORT_4_4_4_4;
 		return true;
 #if !USE_FORCED_GLES && !USE_FORCED_GLES2
-	// The formats below are not supported by every GLES implementation.
-	// Thus, we do not mark them as supported when a GLES context is setup.
 	} else if (isGLESContext()) {
 		return false;
 #ifdef SCUMM_LITTLE_ENDIAN
@@ -1575,44 +1572,7 @@ bool OpenGLGraphicsManager::getGLPixelFormat(const Graphics::PixelFormat &pixelF
 		glFormat = GL_BGRA;
 		glType = GL_UNSIGNED_SHORT_1_5_5_5_REV;
 		return true;
-	} else if (pixelFormat == Graphics::PixelFormat(2, 4, 4, 4, 4, 8, 4, 0, 12)) { // ARGB4444
-		glIntFormat = GL_RGBA;
-		glFormat = GL_BGRA;
-		glType = GL_UNSIGNED_SHORT_4_4_4_4_REV;
-		return true;
-#ifdef SCUMM_BIG_ENDIAN
-	} else if (pixelFormat == Graphics::PixelFormat(4, 8, 8, 8, 8, 0, 8, 16, 24)) { // ABGR8888
-		glIntFormat = GL_RGBA;
-		glFormat = GL_RGBA;
-		glType = GL_UNSIGNED_INT_8_8_8_8_REV;
-		return true;
 #endif
-	} else if (pixelFormat == Graphics::PixelFormat(4, 8, 8, 8, 8, 8, 16, 24, 0)) { // BGRA8888
-		glIntFormat = GL_RGBA;
-		glFormat = GL_BGRA;
-		glType = GL_UNSIGNED_INT_8_8_8_8;
-		return true;
-	} else if (pixelFormat == Graphics::PixelFormat(2, 5, 6, 5, 0, 0, 5, 11, 0)) { // BGR565
-		glIntFormat = GL_RGB;
-		glFormat = GL_RGB;
-		glType = GL_UNSIGNED_SHORT_5_6_5_REV;
-		return true;
-	} else if (pixelFormat == Graphics::PixelFormat(2, 5, 5, 5, 1, 1, 6, 11, 0)) { // BGRA5551
-		glIntFormat = GL_RGBA;
-		glFormat = GL_BGRA;
-		glType = GL_UNSIGNED_SHORT_5_5_5_1;
-		return true;
-	} else if (pixelFormat == Graphics::PixelFormat(2, 4, 4, 4, 4, 0, 4, 8, 12)) { // ABGR4444
-		glIntFormat = GL_RGBA;
-		glFormat = GL_RGBA;
-		glType = GL_UNSIGNED_SHORT_4_4_4_4_REV;
-		return true;
-	} else if (pixelFormat == Graphics::PixelFormat(2, 4, 4, 4, 4, 4, 8, 12, 0)) { // BGRA4444
-		glIntFormat = GL_RGBA;
-		glFormat = GL_BGRA;
-		glType = GL_UNSIGNED_SHORT_4_4_4_4;
-		return true;
-#endif // !USE_FORCED_GLES && !USE_FORCED_GLES2
 	} else {
 		return false;
 	}
@@ -1622,13 +1582,8 @@ bool OpenGLGraphicsManager::gameNeedsAspectRatioCorrection() const {
 	if (_currentState.aspectRatioCorrection) {
 		const uint width = getWidth();
 		const uint height = getHeight();
-
-		// In case we enable aspect ratio correction we force a 4/3 ratio.
-		// But just for 320x200 and 640x400 games, since other games do not need
-		// this.
 		return (width == 320 && height == 200) || (width == 640 && height == 400);
 	}
-
 	return false;
 }
 
@@ -1651,21 +1606,15 @@ void OpenGLGraphicsManager::recalculateDisplayAreas() {
 	}
 #endif
 
-	// Setup drawing limitation for game graphics.
-	// This involves some trickery because OpenGL's viewport coordinate system
-	// is upside down compared to ours.
 	_targetBuffer->setScissorBox(_gameDrawRect.left,
-	                          _windowHeight - _gameDrawRect.height() - _gameDrawRect.top,
-	                          _gameDrawRect.width(),
-	                          _gameDrawRect.height());
+								_windowHeight - _gameDrawRect.height() - _gameDrawRect.top,
+								_gameDrawRect.width(),
+								_gameDrawRect.height());
 
 	_shakeOffsetScaled = Common::Point(_gameScreenShakeXOffset * _gameDrawRect.width() / (int)_currentState.gameWidth,
 		_gameScreenShakeYOffset * _gameDrawRect.height() / (int)_currentState.gameHeight);
 
-	// Update the cursor position to adjust for new display area.
 	setMousePosition(_cursorX, _cursorY);
-
-	// Force a redraw to assure screen is properly redrawn.
 	_forceRedraw = true;
 }
 
@@ -1692,23 +1641,20 @@ void OpenGLGraphicsManager::recalculateCursorScaling() {
 	uint cursorWidth = _cursor->getWidth();
 	uint cursorHeight = _cursor->getHeight();
 
-	// By default we use the unscaled versions.
 	_cursorHotspotXScaled = _cursorHotspotX;
 	_cursorHotspotYScaled = _cursorHotspotY;
 	_cursorWidthScaled = cursorWidth;
 	_cursorHeightScaled = cursorHeight;
 
-	// In case scaling is actually enabled we will scale the cursor according
-	// to the game screen.
 	if (!_cursorDontScale) {
 		const frac_t screenScaleFactorX = intToFrac(_gameDrawRect.width()) / _gameScreen->getWidth();
 		const frac_t screenScaleFactorY = intToFrac(_gameDrawRect.height()) / _gameScreen->getHeight();
 
 		_cursorHotspotXScaled = fracToInt(_cursorHotspotXScaled * screenScaleFactorX);
-		_cursorWidthScaled    = fracToDouble(cursorWidth        * screenScaleFactorX);
+		_cursorWidthScaled    = (double)cursorWidth * fracToDouble(screenScaleFactorX);
 
 		_cursorHotspotYScaled = fracToInt(_cursorHotspotYScaled * screenScaleFactorY);
-		_cursorHeightScaled   = fracToDouble(cursorHeight       * screenScaleFactorY);
+		_cursorHeightScaled   = (double)cursorHeight * fracToDouble(screenScaleFactorY);
 	}
 }
 
@@ -1718,26 +1664,10 @@ void OpenGLGraphicsManager::updateLinearFiltering() {
 		_libretroPipeline->enableLinearFiltering(_currentState.filtering);
 	}
 #endif
-
-	if (_gameScreen) {
-		_gameScreen->enableLinearFiltering(_currentState.filtering);
-	}
-
-	if (_cursor) {
-		_cursor->enableLinearFiltering(_currentState.filtering);
-	}
-
-	if (_cursorMask) {
-		_cursorMask->enableLinearFiltering(_currentState.filtering);
-	}
-
-	// The overlay UI should also obey the filtering choice (managed via the Filter Graphics checkbox in Graphics Tab).
-	// Thus, when overlay filtering is disabled, scaling in OPENGL is done with GL_NEAREST (nearest neighbor scaling).
-	// It may look crude, but it should be crispier and it's left to user choice to enable filtering.
-	if (_overlay) {
-		_overlay->enableLinearFiltering(_currentState.filtering);
-	}
-
+	if (_gameScreen) _gameScreen->enableLinearFiltering(_currentState.filtering);
+	if (_cursor) _cursor->enableLinearFiltering(_currentState.filtering);
+	if (_cursorMask) _cursorMask->enableLinearFiltering(_currentState.filtering);
+	if (_overlay) _overlay->enableLinearFiltering(_currentState.filtering);
 }
 
 #ifdef USE_OSD
@@ -1749,16 +1679,10 @@ const Graphics::Font *OpenGLGraphicsManager::getFontOSD() const {
 bool OpenGLGraphicsManager::saveScreenshot(const Common::String &filename) const {
 	const uint width  = _windowWidth;
 	const uint height = _windowHeight;
-
-	// GL_PACK_ALIGNMENT is 4 so each row must be aligned to 4 bytes boundary
-	// A line of a BMP image must also have a size divisible by 4.
-	// Calculate lineSize as the next multiple of 4 after the real line size
-	const uint lineSize        = (width * 3 + 3) & ~3;
+	const uint lineSize = (width * 3 + 3) & ~3;
 
 	Common::DumpFile out;
-	if (!out.open(filename)) {
-		return false;
-	}
+	if (!out.open(filename)) return false;
 
 	Common::Array<uint8> pixels;
 	pixels.resize(lineSize * height);
